@@ -5,6 +5,7 @@ import {
 } from "prosemirror-view";
 import React, { ComponentType, ReactNode, useMemo, useState } from "react";
 
+import { ProseMirrorContext } from "../ProseMirrorContext.js";
 import { EditorContext } from "../contexts/EditorContext.js";
 import { EditorStateContext } from "../contexts/EditorStateContext.js";
 import { NodeViewContext } from "../contexts/NodeViewContext.js";
@@ -77,15 +78,17 @@ function ProseMirrorInner({
   );
 
   return (
-    <EditorContext.Provider value={editor}>
-      <EditorStateContext.Provider value={state}>
-        <NodeViewContext.Provider value={nodeViewContextValue}>
-          <DocNodeViewContext.Provider value={docNodeViewContextValue}>
-            {children}
-          </DocNodeViewContext.Provider>
-        </NodeViewContext.Provider>
-      </EditorStateContext.Provider>
-    </EditorContext.Provider>
+    <ProseMirrorContext.Provider value={editor.view}>
+      <EditorContext.Provider value={editor}>
+        <EditorStateContext.Provider value={state}>
+          <NodeViewContext.Provider value={nodeViewContextValue}>
+            <DocNodeViewContext.Provider value={docNodeViewContextValue}>
+              {children}
+            </DocNodeViewContext.Provider>
+          </NodeViewContext.Provider>
+        </EditorStateContext.Provider>
+      </EditorContext.Provider>
+    </ProseMirrorContext.Provider>
   );
 }
 

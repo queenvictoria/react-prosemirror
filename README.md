@@ -611,6 +611,51 @@ type useEditorState = () => EditorState | null;
 
 Provides access to the current EditorState value.
 
+### `useProseMirrorContext`
+
+```tsx
+type useProseMirrorContext = () => EditorView | null;
+```
+
+Provides direct access to the ProseMirror EditorView instance. This hook allows
+consumers to access EditorView APIs like `nodeDOM(pos)`, scrolling to
+nodes/positions, and other EditorView methods.
+
+Returns `null` if called outside of a `ProseMirror` component or if the editor
+is not yet mounted.
+
+Example usage:
+
+```tsx
+import { useProseMirrorContext } from "@handlewithcare/react-prosemirror";
+
+function ScrollToPositionButton({ pos }: { pos: number }) {
+  const view = useProseMirrorContext();
+
+  const scrollToPosition = () => {
+    if (view) {
+      const coords = view.coordsAtPos(pos);
+      view.dom.scrollIntoView({ block: "nearest" });
+    }
+  };
+
+  return <button onClick={scrollToPosition}>Scroll to position {pos}</button>;
+}
+
+function NodeDOMInspector({ pos }: { pos: number }) {
+  const view = useProseMirrorContext();
+
+  const getNodeDOM = () => {
+    if (view) {
+      const domNode = view.nodeDOM(pos);
+      console.log("DOM node at position", pos, ":", domNode);
+    }
+  };
+
+  return <button onClick={getNodeDOM}>Inspect DOM at {pos}</button>;
+}
+```
+
 ### `useEditorEventCallback`
 
 ```tsx
