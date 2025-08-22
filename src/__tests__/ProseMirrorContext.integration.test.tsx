@@ -4,10 +4,10 @@ import { Schema } from "prosemirror-model";
 import { EditorState } from "prosemirror-state";
 import React from "react";
 
+import { useProseMirrorContext } from "../ProseMirrorContext.js";
 import { ProseMirror } from "../components/ProseMirror.js";
 import { ProseMirrorDoc } from "../components/ProseMirrorDoc.js";
 import { reactKeys } from "../plugins/reactKeys.js";
-import { useProseMirrorContext } from "../ProseMirrorContext.js";
 
 // Test component that uses the hook
 function TestConsumer() {

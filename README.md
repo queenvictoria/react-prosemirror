@@ -628,20 +628,54 @@ Example usage:
 
 ```tsx
 import { useProseMirrorContext } from "@handlewithcare/react-prosemirror";
+import { TextSelection } from "prosemirror-state";
+import { useEffect } from "react";
 
-function ScrollToPositionButton({ pos }: { pos: number }) {
+// Programmatic scrolling with View API
+function AutoScrollComponent({ targetPos }: { targetPos?: number }) {
   const view = useProseMirrorContext();
 
-  const scrollToPosition = () => {
+  // Scroll automatically when targetPos changes
+  useEffect(() => {
+    if (view && targetPos !== undefined) {
+      const tr = view.state.tr
+        .setSelection(TextSelection.create(view.state.doc, targetPos))
+        .scrollIntoView();
+      view.dispatch(tr);
+    }
+  }, [view, targetPos]);
+
+  return <div>Auto-scrolls to position {targetPos}</div>;
+}
+
+// Interactive scrolling
+function ScrollControls() {
+  const view = useProseMirrorContext();
+
+  const scrollToSelection = () => {
     if (view) {
-      const coords = view.coordsAtPos(pos);
-      view.dom.scrollIntoView({ block: "nearest" });
+      view.scrollToSelection();
     }
   };
 
-  return <button onClick={scrollToPosition}>Scroll to position {pos}</button>;
+  const scrollToPosition = (pos: number) => {
+    if (view) {
+      const tr = view.state.tr
+        .setSelection(TextSelection.create(view.state.doc, pos))
+        .scrollIntoView();
+      view.dispatch(tr);
+    }
+  };
+
+  return (
+    <div>
+      <button onClick={scrollToSelection}>Scroll to Current Selection</button>
+      <button onClick={() => scrollToPosition(0)}>Scroll to Start</button>
+    </div>
+  );
 }
 
+// DOM node inspection
 function NodeDOMInspector({ pos }: { pos: number }) {
   const view = useProseMirrorContext();
 

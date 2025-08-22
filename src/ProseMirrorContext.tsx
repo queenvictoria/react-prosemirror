@@ -20,22 +20,33 @@ export const ProseMirrorContext = createContext<EditorView | null>(null);
  * @example
  * ```tsx
  * import { useProseMirrorContext } from '@handlewithcare/react-prosemirror';
+ * import { TextSelection } from 'prosemirror-state';
+ * import { useEffect } from 'react';
  *
- * function MyComponent() {
+ * function MyComponent({ targetPos }: { targetPos?: number }) {
  *   const view = useProseMirrorContext();
  *
- *   const scrollToPosition = (pos: number) => {
- *     if (view) {
- *       const coords = view.coordsAtPos(pos);
- *       view.dom.scrollIntoView({ block: 'nearest' });
+ *   // Scroll programmatically when targetPos changes
+ *   useEffect(() => {
+ *     if (view && targetPos !== undefined) {
+ *       const tr = view.state.tr
+ *         .setSelection(TextSelection.create(view.state.doc, targetPos))
+ *         .scrollIntoView();
+ *       view.dispatch(tr);
  *     }
- *   };
+ *   }, [view, targetPos]);
  *
  *   const getNodeDOM = (pos: number) => {
  *     if (view) {
  *       return view.nodeDOM(pos);
  *     }
  *     return null;
+ *   };
+ *
+ *   const scrollToSelection = () => {
+ *     if (view) {
+ *       view.scrollToSelection();
+ *     }
  *   };
  *
  *   // ... rest of component
