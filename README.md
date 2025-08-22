@@ -611,6 +611,85 @@ type useEditorState = () => EditorState | null;
 
 Provides access to the current EditorState value.
 
+### `useProseMirrorContext`
+
+```tsx
+type useProseMirrorContext = () => EditorView | null;
+```
+
+Provides direct access to the ProseMirror EditorView instance. This hook allows
+consumers to access EditorView APIs like `nodeDOM(pos)`, scrolling to
+nodes/positions, and other EditorView methods.
+
+Returns `null` if called outside of a `ProseMirror` component or if the editor
+is not yet mounted.
+
+Example usage:
+
+```tsx
+import { useProseMirrorContext } from "@handlewithcare/react-prosemirror";
+import { TextSelection } from "prosemirror-state";
+import { useEffect } from "react";
+
+// Programmatic scrolling with View API
+function AutoScrollComponent({ targetPos }: { targetPos?: number }) {
+  const view = useProseMirrorContext();
+
+  // Scroll automatically when targetPos changes
+  useEffect(() => {
+    if (view && targetPos !== undefined) {
+      const tr = view.state.tr
+        .setSelection(TextSelection.create(view.state.doc, targetPos))
+        .scrollIntoView();
+      view.dispatch(tr);
+    }
+  }, [view, targetPos]);
+
+  return <div>Auto-scrolls to position {targetPos}</div>;
+}
+
+// Interactive scrolling
+function ScrollControls() {
+  const view = useProseMirrorContext();
+
+  const scrollToSelection = () => {
+    if (view) {
+      view.scrollToSelection();
+    }
+  };
+
+  const scrollToPosition = (pos: number) => {
+    if (view) {
+      const tr = view.state.tr
+        .setSelection(TextSelection.create(view.state.doc, pos))
+        .scrollIntoView();
+      view.dispatch(tr);
+    }
+  };
+
+  return (
+    <div>
+      <button onClick={scrollToSelection}>Scroll to Current Selection</button>
+      <button onClick={() => scrollToPosition(0)}>Scroll to Start</button>
+    </div>
+  );
+}
+
+// DOM node inspection
+function NodeDOMInspector({ pos }: { pos: number }) {
+  const view = useProseMirrorContext();
+
+  const getNodeDOM = () => {
+    if (view) {
+      const domNode = view.nodeDOM(pos);
+      console.log("DOM node at position", pos, ":", domNode);
+    }
+  };
+
+  return <button onClick={getNodeDOM}>Inspect DOM at {pos}</button>;
+}
+```
+
 ### `useEditorEventCallback`
 
 ```tsx
